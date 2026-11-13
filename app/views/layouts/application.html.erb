@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <% if modern_theme? %><meta name="viewport" content="width=device-width, initial-scale=1" /><% end %>
     <%= stylesheet_link_tag @user_theme, :media => "all" %>
     <%= stylesheet_link_tag "print", :media => "print" %>
     <%= javascript_include_tag "application" %>
@@ -33,10 +34,17 @@
     <title><%= @page_title %></title>
   </head>
 
-  <body>
+  <body<%= ' class="modern-ui"'.html_safe if modern_theme? %>>
+  <% if modern_theme? %>
+    <div class="mx-shell">
+    <%= render partial: "shared/modern_sidebar" %>
+    <main class="mx-main">
+    <%= render partial: "shared/modern_header" %>
+  <% else %>
     <div class="bootstrap">
       <%= render partial: "shared/navbar" %>
     </div>
+  <% end %>
 
     <div class="legacy-ui <%= controller.controller_name %>">
       <%= render_flash %>
@@ -47,5 +55,10 @@
 
       <%= render :partial => "shared/footer" %>
    </div><!-- .legacy-ui -->
+  <% if modern_theme? %>
+    </main>
+    </div><!-- .mx-shell -->
+    <%= render partial: "shared/modern_tabbar" %>
+  <% end %>
   </body>
 </html>

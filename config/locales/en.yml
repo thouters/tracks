@@ -608,6 +608,28 @@ en:
     successful_with_session_info: 'Login successful:'
     unsuccessful: Login unsuccessful.
     user_no_expiry: Stay logged in
+  modern:
+    add: Add
+    add_action: Add an action
+    close_menu: Close menu
+    filter_all: All
+    filter_due: Due & overdue
+    filter_no_project: No project
+    filters: Filters
+    more: More
+    more_options: More options
+    navigation: Main
+    new_context: New context
+    new_project: New project
+    next_actions: Next actions
+    no_projects: No active projects
+    open_menu: Open menu
+    quickadd_help: "@context ~project #tag, due <fri or <261120, show from >mon, * to star"
+    quickadd_placeholder: "Add an action… e.g. Call plumber @phone ~House <fri"
+    search: Search
+    search_placeholder: Search actions
+    tab_actions: Actions
+    views: Views
   models:
     preference:
       due_in: Due in %{days} days

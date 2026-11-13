@@ -1,0 +1,71 @@
+<aside class="mx-sidebar" id="mx-sidebar" aria-label="<%= t('modern.navigation') %>">
+  <div class="mx-brand">
+    <%= link_to root_path, class: 'mx-brand-link' do %>
+      <span class="mx-logo" aria-hidden="true"><%= icon('fas', 'check') %></span>
+      <span>Tracks</span>
+    <% end %>
+    <button type="button" class="mx-icon-button mx-drawer-close" aria-label="<%= t('modern.close_menu') %>" data-mx-drawer="close">
+      <%= icon('fas', 'xmark') %>
+    </button>
+  </div>
+
+  <nav class="mx-nav" aria-label="<%= t('modern.views') %>">
+    <%= modern_nav_link t('modern.next_actions'), root_path, 'list-check', count: modern_next_actions_count, accesskey: 't', title: t('layouts.navigation.home_title') %>
+    <%= modern_nav_link t('layouts.navigation.starred'), tag_path('starred'), 'star', count: modern_starred_count, title: t('layouts.navigation.starred_title') %>
+    <%= modern_nav_link t('layouts.navigation.tickler'), tickler_path, 'clock', count: modern_tickler_count, accesskey: 'k', title: t('layouts.navigation.tickler_title') %>
+    <%= modern_nav_link t('layouts.navigation.calendar'), calendar_path, 'calendar', title: t('layouts.navigation.calendar_title') %>
+    <%= modern_nav_link t('common.review'), review_path, 'rotate', accesskey: 'r', title: t('layouts.navigation.review_title') %>
+    <%= modern_nav_link t('layouts.navigation.completed_tasks'), done_overview_path, 'circle-check', accesskey: 'd', title: t('layouts.navigation.completed_tasks_title') %>
+  </nav>
+
+  <section class="mx-side-section">
+    <div class="mx-side-heading">
+      <%= link_to t('common.projects'), projects_path, accesskey: 'p', title: t('layouts.navigation.projects_title') %>
+      <%= link_to projects_path, class: 'mx-icon-button', title: t('modern.new_project'), 'aria-label': t('modern.new_project') do %><%= icon('fas', 'plus') %><% end %>
+    </div>
+    <% if modern_sidebar_projects.empty? %>
+      <p class="mx-side-empty"><%= t('modern.no_projects') %></p>
+    <% end %>
+    <% modern_sidebar_projects.each do |entry| %>
+      <%= link_to project_path(entry[:project]), class: "mx-side-project#{' is-current' if modern_current?(project_path(entry[:project]))}" do %>
+        <span class="mx-side-row"><span class="mx-side-name"><%= entry[:project].name %></span><span class="mx-side-count"><%= entry[:open] %></span></span>
+        <span class="mx-progress" aria-hidden="true"><span style="width: <%= entry[:percent] %>%"></span></span>
+      <% end %>
+    <% end %>
+  </section>
+
+  <section class="mx-side-section">
+    <div class="mx-side-heading">
+      <%= link_to t('common.contexts'), contexts_path, accesskey: 'c', title: t('layouts.navigation.contexts_title') %>
+      <%= link_to contexts_path, class: 'mx-icon-button', title: t('modern.new_context'), 'aria-label': t('modern.new_context') do %><%= icon('fas', 'plus') %><% end %>
+    </div>
+    <% modern_sidebar_contexts.each do |entry| %>
+      <%= link_to context_path(entry[:context]), class: "mx-side-context#{' is-current' if modern_current?(context_path(entry[:context]))}" do %>
+        <span class="mx-dot mx-dot-<%= entry[:color] %>" aria-hidden="true"></span>
+        <span class="mx-side-name"><%= entry[:context].name %></span>
+        <span class="mx-side-count"><%= entry[:count] %></span>
+      <% end %>
+    <% end %>
+  </section>
+
+  <details class="mx-side-section mx-more">
+    <summary class="mx-side-heading"><%= t('modern.more') %></summary>
+    <%= modern_nav_link t('common.notes'), notes_path, 'note-sticky', accesskey: 'o', title: t('layouts.navigation.notes_title') %>
+    <%= modern_nav_link t('layouts.navigation.recurring_todos'), recurring_todos_path, 'repeat', title: t('layouts.navigation.recurring_todos_title') %>
+    <%= modern_nav_link t('layouts.navigation.stats'), stats_path, 'chart-simple', title: t('layouts.navigation.stats_title') %>
+    <%= modern_nav_link t('layouts.navigation.feeds'), feeds_path, 'rss', title: t('layouts.navigation.feeds_title') %>
+    <%= modern_nav_link t('layouts.navigation.export'), data_path, 'download', accesskey: 'e', title: t('layouts.navigation.export_title') %>
+    <%= modern_nav_link t('layouts.navigation.import'), import_data_path, 'upload', accesskey: 'i', title: t('layouts.navigation.import_title') %>
+    <%= modern_nav_link t('layouts.navigation.help_page'), help_path, 'circle-question' %>
+    <% if current_user.is_admin? %>
+      <%= modern_nav_link t('layouts.navigation.manage_users'), users_path, 'users', accesskey: 'a', title: t('layouts.navigation.manage_users_title') %>
+    <% end %>
+  </details>
+
+  <div class="mx-side-footer">
+    <span class="mx-user"><%= current_user.display_name %></span>
+    <%= link_to preferences_path, class: 'mx-icon-button', accesskey: 'u', title: t('layouts.navigation.preferences'), 'aria-label': t('layouts.navigation.preferences') do %><%= icon('fas', 'gear') %><% end %>
+    <%= link_to logout_path, class: 'mx-icon-button', title: t('common.logout'), 'aria-label': t('common.logout') do %><%= icon('fas', 'right-from-bracket') %><% end %>
+  </div>
+</aside>
+<div class="mx-scrim" data-mx-drawer="close" aria-hidden="true"></div>

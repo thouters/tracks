@@ -556,6 +556,28 @@ nl:
     successful_with_session_info: 'Login succesvol:'
     unsuccessful: Login mislukt.
     user_no_expiry: Blijf ingelogd
+  modern:
+    add: Toevoegen
+    add_action: Actie toevoegen
+    close_menu: Menu sluiten
+    filter_all: Alles
+    filter_due: Deadline & te laat
+    filter_no_project: Zonder project
+    filters: Filters
+    more: Meer
+    more_options: Meer opties
+    navigation: Hoofdmenu
+    new_context: Nieuwe context
+    new_project: Nieuw project
+    next_actions: Volgende acties
+    no_projects: Geen actieve projecten
+    open_menu: Menu openen
+    quickadd_help: "@context ~project #tag, deadline <vr of <261120, tonen vanaf >ma, * voor een ster"
+    quickadd_placeholder: "Actie toevoegen… bv. Loodgieter bellen @telefoon ~Huis <vr"
+    search: Zoeken
+    search_placeholder: Acties zoeken
+    tab_actions: Acties
+    views: Weergaven
   models:
     preference:
       due_in: Deadline over %{days} dagen

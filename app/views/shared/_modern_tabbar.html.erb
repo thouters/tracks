@@ -1,0 +1,8 @@
+<%# Bottom tab bar, only shown on narrow screens (see include/modern.scss) %>
+<nav class="mx-tabbar" aria-label="<%= t('modern.navigation') %>">
+  <%= link_to root_path, class: "mx-tab#{' is-current' if modern_current?(root_path)}" do %><%= icon('fas', 'list-check') %><span><%= t('modern.tab_actions') %></span><% end %>
+  <%= link_to tag_path('starred'), class: "mx-tab#{' is-current' if modern_current?(tag_path('starred'))}" do %><%= icon('fas', 'star') %><span><%= t('layouts.navigation.starred') %></span><% end %>
+  <%= link_to projects_path, class: "mx-tab#{' is-current' if modern_current?(projects_path)}" do %><%= icon('fas', 'folder') %><span><%= t('common.projects') %></span><% end %>
+  <%= link_to review_path, class: "mx-tab#{' is-current' if modern_current?(review_path)}" do %><%= icon('fas', 'rotate') %><span><%= t('common.review') %></span><% end %>
+</nav>
+<button type="button" class="mx-fab" id="mx-fab" aria-label="<%= t('modern.add_action') %>" hidden><%= icon('fas', 'plus') %></button>

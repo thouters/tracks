@@ -1,0 +1,34 @@
+<header class="mx-header">
+  <button type="button" class="mx-icon-button mx-menu-button" aria-label="<%= t('modern.open_menu') %>" aria-controls="mx-sidebar" data-mx-drawer="open">
+    <%= icon('fas', 'bars') %>
+  </button>
+  <div class="mx-titles">
+    <span class="mx-date"><%= l(Time.zone.today, format: current_user.prefs.title_date_format) %></span>
+    <h1 class="mx-title"><%= modern_page_title %></h1>
+  </div>
+  <%= form_tag(search_results_path, class: 'mx-search', role: 'search') do %>
+    <%= icon('fas', 'magnifying-glass', class: 'mx-search-icon') %>
+    <label for="mx-search-input" class="mx-sr-only"><%= t('modern.search') %></label>
+    <%= search_field_tag(:search, params[:search], id: 'mx-search-input', placeholder: t('modern.search_placeholder')) %>
+    <kbd class="mx-kbd" aria-hidden="true">/</kbd>
+  <% end %>
+</header>
+
+<%# Shown by modern.js on pages that have the new-action form %>
+<form class="mx-quickadd" id="mx-quickadd" hidden
+      data-contexts="<%= current_user.contexts.pluck(:name).to_json %>"
+      data-projects="<%= current_user.projects.uncompleted.pluck(:name).to_json %>">
+  <%= icon('fas', 'plus', class: 'mx-quickadd-icon') %>
+  <label for="mx-quickadd-input" class="mx-sr-only"><%= t('modern.add_action') %></label>
+  <input type="text" id="mx-quickadd-input" autocomplete="off" placeholder="<%= t('modern.quickadd_placeholder') %>" aria-describedby="mx-quickadd-help">
+  <button type="submit" class="mx-button mx-button-primary"><%= t('modern.add') %></button>
+  <button type="button" class="mx-button" id="mx-quickadd-more" aria-expanded="false"><%= t('modern.more_options') %></button>
+  <p id="mx-quickadd-help" class="mx-quickadd-help"><%= t('modern.quickadd_help') %></p>
+</form>
+
+<div class="mx-filters" id="mx-filters" role="group" aria-label="<%= t('modern.filters') %>" hidden>
+  <button type="button" class="mx-chip" data-mx-filter="all" aria-pressed="true"><%= t('modern.filter_all') %></button>
+  <button type="button" class="mx-chip" data-mx-filter="due" aria-pressed="false"><%= t('modern.filter_due') %></button>
+  <button type="button" class="mx-chip" data-mx-filter="starred" aria-pressed="false"><%= t('layouts.navigation.starred') %></button>
+  <button type="button" class="mx-chip" data-mx-filter="noproject" aria-pressed="false"><%= t('modern.filter_no_project') %></button>
+</div>

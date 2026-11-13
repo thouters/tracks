@@ -25,6 +25,7 @@
 //= require tracks
 //= require tracks_pages
 //= require disable_fx_in_test
+//= require modern
 
 // Stuff in vendor/assets
 //= require jquery.ui.touch-punch.min

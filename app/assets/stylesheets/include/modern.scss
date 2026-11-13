@@ -82,13 +82,6 @@ body { background-color: var(--tr-bg); }
   a, a:link, a:visited, a:active { color: var(--tr-text); }
   a:hover { color: var(--tr-accent); background-color: transparent; }
 
-  #content { margin-top: 76px; }
-
-  #display_box {
-    margin-right: 344px;
-    padding: 0 24px 0 28px;
-  }
-
   h2 {
     a, a:link, a:active, a:visited { color: var(--tr-text); }
     a:hover { color: var(--tr-accent); }
@@ -468,11 +461,6 @@ body { background-color: var(--tr-bg); }
   .sf-item-selected { background: var(--tr-surface-2); }
 
   // ------------------------------------------------- flash messages
-  div#message_holder {
-    left: auto;
-    right: 24px;
-    top: 64px;
-  }
   h4.alert {
     font-size: 13px;
     font-weight: 500;
@@ -492,12 +480,6 @@ body { background-color: var(--tr-bg); }
   }
 
   // ----------------------------------- the new-action form, sidebar
-  div#input_box {
-    top: 76px;
-    right: 24px;
-    width: 300px;
-  }
-
   #todo_new_action_container, #project_new_project_container, #context_new_container, #recurring_new_container {
     width: auto;
     padding: 14px 16px 16px;
@@ -630,3 +612,567 @@ body { background-color: var(--tr-bg); }
   border-color: var(--tr-accent);
 }
 .ui-widget-overlay { background: #000; opacity: .45; }
+
+// =====================================================================
+// The layout (layouts/application.html.erb with body.modern-ui): a sidebar
+// on the left, a header with the quick-add bar and filters, the page below.
+// On phones the sidebar is a drawer and there is a tab bar at the bottom.
+// =====================================================================
+
+$mx-phone: 767px;
+
+body.modern-ui { margin: 0; }
+
+.mx-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.mx-shell {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.mx-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 24px clamp(16px, 3vw, 40px) 48px;
+}
+
+.mx-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--tr-muted);
+  cursor: pointer;
+  font-size: 13px;
+  &:hover, &:focus-visible { background: var(--tr-surface-2); color: var(--tr-text); }
+}
+
+.mx-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--tr-border);
+  border-radius: 9px;
+  background: var(--tr-surface);
+  color: var(--tr-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover { background: var(--tr-surface-2); }
+}
+.mx-button-primary {
+  border-color: var(--tr-accent);
+  background: var(--tr-accent);
+  color: var(--tr-on-accent);
+  &:hover { border-color: var(--tr-accent-hover); background: var(--tr-accent-hover); }
+}
+
+.mx-quickadd[hidden], .mx-filters[hidden], .mx-fab[hidden] { display: none !important; }
+
+// ------------------------------------------------------------- sidebar
+.mx-sidebar {
+  flex: none;
+  width: 248px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 18px 12px 14px;
+  background: var(--tr-surface);
+  border-right: 1px solid var(--tr-border);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  font-size: 14px;
+
+  a, a:link, a:visited { color: var(--tr-text); text-decoration: none; }
+}
+
+.mx-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+.mx-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mx-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--tr-accent);
+  color: var(--tr-on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+.mx-drawer-close { display: none; }
+
+.mx-nav, .mx-side-section { display: flex; flex-direction: column; gap: 2px; }
+
+.mx-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  &:hover { background: var(--tr-surface-2); }
+  .mx-nav-icon { color: var(--tr-muted); font-size: 14px; }
+  .mx-nav-label { flex: 1; min-width: 0; }
+  .mx-nav-count { font-size: 12px; color: var(--tr-muted); }
+  &.is-current, &.is-current:link, &.is-current:visited {
+    background: var(--tr-accent-soft);
+    color: var(--tr-accent-ink);
+    font-weight: 600;
+    .mx-nav-icon, .mx-nav-count { color: var(--tr-accent-ink); }
+  }
+}
+
+.mx-side-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tr-muted);
+  a, a:link, a:visited { color: var(--tr-muted); }
+  a:hover { color: var(--tr-text); }
+  .mx-icon-button { width: 24px; height: 24px; font-size: 11px; }
+}
+
+.mx-side-empty { margin: 0; padding: 4px 10px; font-size: 13px; color: var(--tr-muted); }
+
+.mx-side-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mx-side-count { font-size: 12px; color: var(--tr-muted); }
+
+.mx-side-project {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  &:hover { background: var(--tr-surface-2); }
+  &.is-current { background: var(--tr-accent-soft); }
+}
+.mx-side-row { display: flex; align-items: center; gap: 8px; }
+.mx-progress {
+  display: block;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--tr-border);
+  overflow: hidden;
+  span { display: block; height: 100%; border-radius: 3px; background: var(--tr-accent); }
+}
+
+.mx-side-context {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  &:hover { background: var(--tr-surface-2); }
+  &.is-current { background: var(--tr-accent-soft); }
+}
+.mx-dot { flex: none; width: 8px; height: 8px; border-radius: 99px; background: var(--tr-ctx-1); }
+.mx-dot-2 { background: var(--tr-ctx-2); }
+.mx-dot-3 { background: var(--tr-ctx-3); }
+.mx-dot-4 { background: var(--tr-ctx-4); }
+
+.mx-more {
+  > summary {
+    list-style: none;
+    cursor: pointer;
+    justify-content: flex-start;
+    gap: 6px;
+    &::-webkit-details-marker { display: none; }
+    &::after { content: "▸"; font-size: 10px; }
+  }
+  &[open] > summary::after { content: "▾"; }
+}
+
+.mx-side-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px 0 10px;
+  border-top: 1px solid var(--tr-border-soft);
+  .mx-user {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    color: var(--tr-muted);
+  }
+}
+
+.mx-scrim { display: none; }
+
+// -------------------------------------------------------------- header
+.mx-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 18px;
+}
+.mx-menu-button { display: none; }
+.mx-titles { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mx-date { font-size: 13px; color: var(--tr-muted); }
+.mx-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--tr-text);
+}
+
+.mx-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--tr-border);
+  border-radius: 10px;
+  background: var(--tr-surface);
+  color: var(--tr-muted);
+  margin: 0;
+  &:focus-within { border-color: var(--tr-accent); box-shadow: 0 0 0 3px var(--tr-accent-soft); }
+  input {
+    width: 200px;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--tr-text);
+    font: inherit;
+    font-size: 14px;
+  }
+}
+.mx-kbd {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid var(--tr-border);
+  border-radius: 5px;
+  color: var(--tr-muted);
+  background: transparent;
+  box-shadow: none;
+}
+
+// ----------------------------------------------- quick add and filters
+.mx-quickadd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0 0 12px;
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--tr-border);
+  border-radius: 14px;
+  background: var(--tr-surface);
+  box-shadow: var(--tr-shadow);
+  &:focus-within { border-color: var(--tr-accent); box-shadow: 0 0 0 3px var(--tr-accent-soft); }
+
+  .mx-quickadd-icon { color: var(--tr-accent); }
+  input {
+    flex: 1 1 200px;
+    min-width: 0;
+    height: 36px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--tr-text);
+    font: inherit;
+    font-size: 15px;
+    &::placeholder { color: var(--tr-muted); }
+  }
+}
+// floats under the bar while typing, so nothing below it moves when the
+// field loses focus (a click on a filter chip would miss otherwise)
+.mx-quickadd { position: relative; }
+.mx-quickadd-help {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  left: 12px;
+  top: calc(100% + 6px);
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--tr-border);
+  border-radius: 8px;
+  background: var(--tr-surface);
+  box-shadow: var(--tr-shadow-pop);
+  font-size: 12px;
+  color: var(--tr-muted);
+  pointer-events: none;
+}
+.mx-quickadd:focus-within .mx-quickadd-help { display: block; }
+
+.mx-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+.mx-chip {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--tr-border);
+  border-radius: 99px;
+  background: var(--tr-surface);
+  color: var(--tr-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  &:hover { background: var(--tr-surface-2); }
+  &[aria-pressed="true"] {
+    border-color: var(--tr-text);
+    background: var(--tr-text);
+    color: var(--tr-bg);
+  }
+}
+
+.mx-filtered-out, .mx-empty-by-filter { display: none !important; }
+
+// --------------------------------------------------- the page itself
+body.modern-ui {
+  .legacy-ui {
+    margin: 0;
+    padding: 0;
+
+    #content {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    #display_box {
+      order: 1;
+      flex: 999 1 520px;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    // the forms column (new project, new context, …); the new-action form
+    // only when asked for with "More options", the quick-add bar replaces it
+    div#input_box {
+      order: 2;
+      position: static;
+      flex: 1 1 280px;
+      max-width: 320px;
+      width: auto;
+    }
+    #input_box:has(#todo_new_action_container) { display: none; }
+    // the lists under the form are in the sidebar now
+    #sidebar { display: none; }
+
+    div#message_holder {
+      position: fixed;
+      left: auto;
+      right: 24px;
+      top: 16px;
+      z-index: 3000;
+    }
+
+    // drag an action by its grip onto another context's card
+    img.grip { opacity: .55; }
+    .context_target { min-height: 36px; }
+  }
+
+  &.mx-show-form .legacy-ui #input_box:has(#todo_new_action_container) { display: block; }
+
+  .bootstrap .footer { margin-top: 32px; }
+}
+
+.mx-tabbar, .mx-fab { display: none; }
+
+// --------------------------------------------------------------- phone
+@media (max-width: $mx-phone) {
+  .mx-sidebar {
+    position: fixed;
+    z-index: 2001;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    max-width: 86vw;
+    height: auto;
+    transform: translateX(-100%);
+    transition: transform .2s ease;
+    box-shadow: var(--tr-shadow-pop);
+  }
+  body.mx-drawer-open .mx-sidebar { transform: none; }
+  body.mx-drawer-open .mx-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, .4);
+  }
+  .mx-drawer-close { display: inline-flex; width: 44px; height: 44px; }
+  .mx-nav-link, .mx-side-context { min-height: 44px; box-sizing: border-box; }
+
+  .mx-main { padding: 16px 16px calc(96px + env(safe-area-inset-bottom)); }
+
+  .mx-header { flex-wrap: nowrap; align-items: center; gap: 12px; }
+  .mx-menu-button {
+    display: inline-flex;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--tr-border);
+    border-radius: 12px;
+    background: var(--tr-surface);
+    color: var(--tr-text);
+    font-size: 16px;
+  }
+  .mx-titles { flex: 1; }
+  .mx-title { font-size: 24px; }
+  .mx-search {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: hidden;
+    input, .mx-kbd { position: absolute; opacity: 0; width: 1px; }
+    &:focus-within {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 16px;
+      width: auto;
+      z-index: 10;
+      justify-content: flex-start;
+      padding: 0 12px;
+      input { position: static; opacity: 1; flex: 1; width: auto; }
+    }
+  }
+
+  .mx-quickadd { padding-left: 12px; }
+  .mx-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-right: -16px;
+    padding-right: 16px;
+    scrollbar-width: none;
+    .mx-chip { flex: none; }
+  }
+  .mx-quickadd .mx-button-primary { display: none; }  // Enter adds; the FAB focuses the field
+
+  body.modern-ui .legacy-ui {
+    #content { gap: 16px; }
+    div#input_box { max-width: none; flex-basis: 100%; }
+    div#message_holder { left: 16px; right: 16px; top: 12px; }
+    .item-show { padding: 10px 12px; }
+  }
+
+  .mx-tabbar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    position: fixed;
+    z-index: 1500;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 6px 8px env(safe-area-inset-bottom);
+    background: var(--tr-surface);
+    border-top: 1px solid var(--tr-border);
+  }
+  .mx-tab, .mx-tab:link, .mx-tab:visited {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 52px;
+    font-size: 11px;
+    color: var(--tr-muted);
+    text-decoration: none;
+    .fa, .fas, svg { font-size: 18px; }
+    &.is-current { color: var(--tr-accent); font-weight: 600; }
+  }
+
+  .mx-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 1501;
+    right: 16px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    border: 0;
+    border-radius: 18px;
+    background: var(--tr-accent);
+    color: var(--tr-on-accent);
+    font-size: 20px;
+    box-shadow: var(--tr-shadow-pop);
+    cursor: pointer;
+  }
+}
+
+// plain (non-Bootstrap) form fields on the older pages: projects, contexts,
+// recurring actions, preferences
+body.modern-ui .legacy-ui {
+  input[type="text"], input[type="password"], input[type="email"], input:not([type]), textarea, select {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid var(--tr-border);
+    border-radius: 8px;
+    background: var(--tr-surface);
+    color: var(--tr-text);
+    font: inherit;
+    font-size: 14px;
+    &:focus { outline: none; border-color: var(--tr-accent); box-shadow: 0 0 0 3px var(--tr-accent-soft); }
+  }
+  input.item-checkbox { min-height: 0; padding: 0; }
+  label { font-size: 12px; font-weight: 600; color: var(--tr-muted); }
+}
