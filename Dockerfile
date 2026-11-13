@@ -1,5 +1,6 @@
 ARG RUBY_VERSION=3.3
-FROM ruby:${RUBY_VERSION} AS base
+# bookworm: the Dockerfile uses apt-key, which trixie (the default for ruby:3.3 now) dropped
+FROM docker.io/library/ruby:${RUBY_VERSION}-bookworm AS base
 
 WORKDIR /app
 RUN touch /etc/app-env

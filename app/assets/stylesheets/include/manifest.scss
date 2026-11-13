@@ -51,3 +51,13 @@ body {
 .ui-datepicker {
   z-index: 999999 !important;
 }
+
+// Let the browser draw form controls and scrollbars to match, and switch to
+// the dark variant when it asks for one
+:root {
+  color-scheme: light dark;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  @import "dark";
+}

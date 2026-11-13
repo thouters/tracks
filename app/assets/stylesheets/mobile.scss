@@ -305,3 +305,35 @@ div.note_wrapper p {
     background-color: #999999;
     color: #ffffff;
 }
+
+// Dark variant, applied automatically when the browser asks for it
+:root {
+    color-scheme: light dark;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+    body {
+        color: #e4e4e1;
+        background-color: #17181a;
+    }
+
+    a, a:link, a:active, a:visited { color: #ff7b7c; }
+
+    h2 {
+        background-color: #34363b;
+        a, a:link, a:active, a:visited { color: #c9c8c3; }
+    }
+
+    span.r { color: #a6a5a0; }
+    span.tag { background-color: #233a52; color: #cfe6ff; }
+
+    h4.warning { background-color: #4d1f22; color: #ffd6d8; }
+    h4.notice { background-color: #183a1d; color: #b9f0c0; }
+    .errors { background: #4d1f22; }
+
+    input, textarea, select {
+        color: #e4e4e1;
+        background-color: #2b2d31;
+        border: 1px solid #3d3f45;
+    }
+}

@@ -1,0 +1,257 @@
+// Dark variant, applied automatically when the browser asks for it
+// (prefers-color-scheme: dark). Imported by manifest.scss inside the media
+// query, after everything else, and mirrors its .legacy-ui / .bootstrap
+// nesting so these rules win on order at equal specificity.
+
+$dk-bg: #17181a;
+$dk-surface: #222326;
+$dk-surface-2: #2b2d31;
+$dk-surface-3: #34363b;
+$dk-border: #3d3f45;
+$dk-text: #e4e4e1;
+$dk-muted: #a6a5a0;
+$dk-link-hover: #ff7b7c;
+$dk-highlight: #4a4320;  // replaces the light yellows (#ffc, #ffb, notes)
+$dk-tag-bg: #233a52;
+$dk-tag-text: #cfe6ff;
+
+body {
+  color: $dk-text;
+  background-color: $dk-bg;
+}
+
+a, a:link, a:visited { color: $dk-text; }
+a:hover { color: $dk-link-hover; }
+
+hr { border-color: $dk-border; }
+
+input, textarea, select {
+  color: $dk-text;
+  background-color: $dk-surface-2;
+  border-color: $dk-border;
+}
+
+// ---------------------------------------------------------------- legacy UI
+.legacy-ui {
+  .container, .recurring_container, .sortable_row, #edit-recurring-todo {
+    background: $dk-surface;
+    border-color: $dk-border;
+  }
+
+  .completed { background: $dk-surface-2; }
+
+  .container h2 {
+    background: $dk-surface-3;
+    color: $dk-muted;
+  }
+
+  h2 {
+    a, a:link, a:active, a:visited { color: $dk-muted; }
+    a:hover { color: $dk-link-hover; }
+  }
+
+  #input_box h2,
+  form.edit_todo_form ul.predecessor_list { color: $dk-muted; }
+
+  .tools, div.note_footer { border-top-color: $dk-border; }
+  div.note_footer { color: $dk-muted; }
+
+  a.footer_link { color: $dk-link-hover; }
+
+  .needsreview, .stale_l1, .highlight { background: $dk-highlight; }
+  .stale_l2 { background: #5a4d14; }
+  .stale_l3 { background: #6b5a00; }
+
+  .todo_notes {
+    background: #2f2b18;
+    border-color: #5c5426;
+    color: $dk-text;
+  }
+
+  .sf-item-selected, .hover { background: $dk-surface-3; }
+
+  #project_status span { background-color: $dk-surface-2; }
+
+  span.tag {
+    background-color: $dk-tag-bg;
+    color: $dk-tag-text;
+  }
+  span.tag a, span.tag a:link, span.tag a:visited { color: $dk-tag-text; }
+  span.tag a:hover { background-color: #2f557d; color: #fff; }
+
+  h4.warning { background-color: #4d1f22; border-color: #8a3036; color: #ffd6d8; }
+  h4.notice, .project_completed { background-color: #183a1d; border-color: #2e7d38; color: #b9f0c0; }
+
+  .info { background: $dk-surface-3; border-color: $dk-border; }
+
+  .edit-form {
+    background: $dk-surface-2;
+    border-color: $dk-border;
+  }
+
+  div.project_settings {
+    background: $dk-surface-2;
+    color: $dk-muted;
+  }
+
+  form { border-color: $dk-border; }
+
+  a.date_clear:hover,
+  a.icon_delete_dep:hover,
+  a:hover img.icon_delete_dep { background-color: $dk-surface-3; }
+  a.delete_dependency_button:hover { background-color: $dk-surface-2; }
+
+  #feedicons-project, #feedicons-context, #feedlegend {
+    background-color: $dk-surface-2;
+    color: $dk-muted;
+  }
+
+  div.message { background: #3a3519; }
+  .message p { color: $dk-muted; }
+
+  .context_target { border-color: $dk-muted; }
+
+  #errorExplanation {
+    background-color: $dk-surface-2;
+    > p, ul li { color: $dk-text; }
+  }
+
+  input.open_id { background-color: $dk-surface-2; color: $dk-text; }
+
+  div.page_name_auto_complete, div.auto_complete {
+    background: $dk-surface;
+    color: $dk-text;
+    ul { border-color: $dk-border; }
+    li { color: $dk-text; }
+    li.selected { background-color: $dk-highlight; }
+    strong.highlight { color: $dk-link-hover; }
+  }
+
+  table.users_table, table.export_table {
+    background-color: $dk-surface;
+    border-color: $dk-border;
+  }
+
+  .widgets a, .widgets button {
+    background-color: $dk-surface-2;
+    border-color: $dk-border;
+    color: $dk-text;
+  }
+  .widgets a:hover {
+    background-color: #1f3a52;
+    border-color: #2f5878;
+    color: #cfe6ff;
+  }
+  button.positive, .widgets a.positive { color: #8fd16a; }
+  .widgets a.positive:hover, button.positive:hover {
+    background-color: #24361a;
+    border-color: #3e5c2a;
+    color: #a9e486;
+  }
+  .widgets a.negative, button.negative { color: #ff8a7a; }
+  .widgets a.negative:hover, button.negative:hover {
+    background: #45201c;
+    border-color: #6e2f28;
+    color: #ffa597;
+  }
+
+  textarea { background-color: $dk-surface-2; }
+}
+
+.blockUI.blockOverlay, .bigWaiting { background-color: $dk-bg; }
+
+// ---------------------------------------------------------------- Bootstrap
+.bootstrap {
+  color: $dk-text;
+
+  .footer { color: $dk-muted; }
+
+  .form-control {
+    color: $dk-text;
+    background-color: $dk-surface-2;
+    border-color: $dk-border;
+    &::placeholder { color: $dk-muted; }
+    &[disabled], &[readonly] { background-color: $dk-surface; }
+  }
+
+  .input-group-addon {
+    color: $dk-muted;
+    background-color: $dk-surface-3;
+    border-color: $dk-border;
+  }
+
+  .btn-default {
+    color: $dk-text;
+    background-color: $dk-surface-2;
+    border-color: $dk-border;
+    &:hover, &:focus, &:active, &.active { background-color: $dk-surface-3; color: $dk-text; }
+  }
+
+  .dropdown-menu {
+    background-color: $dk-surface;
+    border-color: $dk-border;
+    > li > a { color: $dk-text; }
+    > li > a:hover, > li > a:focus { background-color: $dk-surface-3; color: $dk-text; }
+    .divider { background-color: $dk-border; }
+    .dropdown-header { color: $dk-muted; }
+  }
+
+  .modal-content, .panel, .well, .list-group-item, .popover {
+    color: $dk-text;
+    background-color: $dk-surface;
+    border-color: $dk-border;
+  }
+  .modal-header, .modal-footer, .panel-heading, .panel-footer { border-color: $dk-border; }
+  .panel-default > .panel-heading { color: $dk-text; background-color: $dk-surface-3; border-color: $dk-border; }
+
+  .table > thead > tr > th, .table > tbody > tr > td, .table > tbody > tr > th { border-color: $dk-border; }
+  .table-striped > tbody > tr:nth-of-type(odd) { background-color: $dk-surface; }
+  .table-hover > tbody > tr:hover { background-color: $dk-surface-2; }
+
+  .nav-tabs { border-bottom-color: $dk-border; }
+  .nav-tabs > li > a:hover { background-color: $dk-surface-2; border-color: $dk-border; }
+  .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    color: $dk-text;
+    background-color: $dk-bg;
+    border-color: $dk-border $dk-border transparent;
+  }
+
+  .pagination > li > a, .pagination > li > span {
+    color: $dk-text;
+    background-color: $dk-surface;
+    border-color: $dk-border;
+  }
+
+  .help-block, .text-muted { color: $dk-muted; }
+  .close { color: $dk-text; text-shadow: none; }
+}
+
+// ---------------------------------------------------------------- jQuery UI
+.ui-widget-content {
+  color: $dk-text;
+  background: $dk-surface;
+  border-color: $dk-border;
+  a { color: $dk-text; }
+}
+.ui-widget-header {
+  color: $dk-text;
+  background: $dk-surface-3;
+  border-color: $dk-border;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+  color: $dk-text;
+  background: $dk-surface-2;
+  border-color: $dk-border;
+}
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus,
+.ui-menu .ui-menu-item-wrapper.ui-state-active {
+  color: #fff;
+  background: #3a3d44;
+  border-color: #555;
+}
+.ui-state-highlight, .ui-widget-content .ui-state-highlight {
+  color: $dk-text;
+  background: $dk-highlight;
+  border-color: #6b6130;
+}
+.ui-widget-overlay { background: #000; opacity: .6; }
