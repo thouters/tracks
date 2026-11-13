@@ -618,6 +618,7 @@ en:
       themes:
         black: Black
         light_blue: Light blue
+        modern: Modern (follows light/dark mode)
     project:
       feed_description: Lists all the projects for %{username}
       feed_title: Tracks Projects

@@ -566,6 +566,7 @@ nl:
       themes:
         black: Black
         light_blue: Light blue
+        modern: Modern (volgt licht/donker)
     project:
       feed_description: Een overzicht van alle projecten voor %{username}
       feed_title: Tracks Projecten

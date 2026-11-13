@@ -1,0 +1,27 @@
+/*
+ * The "modern" theme: calm cards, rounded pills, light by default and dark
+ * when the browser asks for it (prefers-color-scheme). The look itself is in
+ * include/modern.scss, after the shared manifest so it wins on order.
+ *
+ *= require jquery-ui
+ *= require jquery-ui/menu
+ *= require jquery-ui/autocomplete
+ *= require jquery-ui/datepicker
+ *= require jquery-ui/dialog
+ *= require jquery-ui/sortable
+ *= require_self
+ */
+
+$gray-lighter: lighten(#000, 93.5%);
+$brand-primary: #3651D4;
+$navbar-inverse-bg: #FFFFFF;
+$navbar-inverse-color: #1C1C1A;
+$navbar-inverse-link-color: #1C1C1A;
+$link-color: unset;
+$link-hover-color: unset;
+$link-bgcolor: unset;
+$box-tablink-color: unset;
+
+// Import all components
+@import 'include/manifest';
+@import 'include/modern';

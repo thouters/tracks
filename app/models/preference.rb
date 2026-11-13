@@ -3,7 +3,7 @@ class Preference < ApplicationRecord
   belongs_to :sms_context, :class_name => 'Context'
 
   def self.themes
-    { :black => 'black', :light_blue => 'light_blue' }
+    { :black => 'black', :light_blue => 'light_blue', :modern => 'modern' }
   end
 
   def self.due_styles
