@@ -447,6 +447,17 @@ body { background-color: var(--tr-bg); }
   }
   #edit-recurring-todo { background: var(--tr-surface); }
 
+  // the rows on /projects and /contexts (legacy gives them a fixed white)
+  .sortable_row {
+    background: var(--tr-surface);
+    color: var(--tr-text);
+    border: 1px solid var(--tr-border);
+    border-radius: 10px;
+    box-shadow: var(--tr-shadow);
+    padding: 8px 12px;
+    margin: 0 0 6px 0;
+  }
+
   // the per-action menu (delete, defer, make project)
   ul.sf-menu ul.todo-submenu {
     background: var(--tr-surface);
