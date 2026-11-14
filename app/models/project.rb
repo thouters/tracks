@@ -42,6 +42,30 @@ class Project < ApplicationRecord
 
   attr_accessor :cached_note_count
 
+  # The columns of the project board (projects#board), in order. "done" is
+  # the same as the state completed and "idea" hides the project, so the
+  # actions of a project that is only an idea stay out of the next actions.
+  STAGES = %w[idea planned doing waiting done].freeze
+
+  # The board column this project is in. Projects that were never put in one,
+  # or whose state was changed elsewhere, get one from their state.
+  def board_stage
+    return 'done' if completed?
+    current = stage if STAGES.include?(stage) && stage != 'done'
+    current || (hidden? ? 'idea' : 'doing')
+  end
+
+  def move_to_stage!(new_stage)
+    raise ArgumentError, "unknown stage #{new_stage}" unless STAGES.include?(new_stage)
+    self.stage = new_stage
+    save!
+    transition_to(case new_stage
+                  when 'done' then :completed
+                  when 'idea' then :hidden
+                  else :active
+                  end)
+  end
+
   def self.null_object
     NullProject.new
   end

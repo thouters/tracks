@@ -7,6 +7,66 @@ class ProjectsControllerTest < ActionController::TestCase
   def setup
   end
 
+  def test_board_puts_projects_in_columns
+    users(:admin_user).prefs.update!(theme: 'modern')
+    projects(:moremoney).hide!
+    projects(:gardenclean).complete!
+    login_as :admin_user
+    get :board
+    assert_response :success
+    columns = assigns['board_columns']
+    assert_equal Project::STAGES, columns.keys
+    assert_includes columns['doing'], projects(:timemachine)
+    assert_includes columns['idea'], projects(:moremoney)
+    assert_includes columns['done'], projects(:gardenclean)
+    assert_not_includes columns.values.flatten, projects(:attendrailsconf)
+    assert_select '#mx-board .mx-column', 5
+    assert_select '.mx-nav-link[href=?]', board_projects_path
+  end
+
+  def test_board_move_sets_stage_state_and_order
+    login_as :admin_user
+    a, b = projects(:timemachine), projects(:gardenclean)
+    post :board_move, params: { id: a.id, stage: 'planned', order: [b.id, a.id] }, format: :json
+    assert_response :success
+    a.reload
+    assert_equal 'planned', a.board_stage
+    assert a.active?
+    assert_equal 1, a.board_position
+    assert_equal 0, b.reload.board_position
+
+    post :board_move, params: { id: a.id, stage: 'idea', order: [a.id] }, format: :json
+    assert a.reload.hidden?
+
+    post :board_move, params: { id: a.id, stage: 'done', order: [] }, format: :json
+    assert a.reload.completed?
+    assert_equal 'done', a.board_stage
+
+    post :board_move, params: { id: a.id, stage: 'waiting', order: [a.id] }, format: :json
+    assert a.reload.active?
+    assert_equal 'waiting', a.board_stage
+  end
+
+  def test_board_move_rejects_unknown_stage_and_other_users_projects
+    login_as :admin_user
+    post :board_move, params: { id: projects(:timemachine).id, stage: 'nonsense' }, format: :json
+    assert_response :unprocessable_entity
+    assert_raises(ActiveRecord::RecordNotFound) do
+      post :board_move, params: { id: projects(:attendrailsconf).id, stage: 'doing' }, format: :json
+    end
+  end
+
+  def test_board_create_adds_project_to_column
+    login_as :admin_user
+    assert_difference 'Project.count' do
+      post :board_create, params: { name: 'Nieuw speeltje', stage: 'idea' }
+    end
+    project = Project.find_by(name: 'Nieuw speeltje')
+    assert project.hidden?
+    assert_equal 'idea', project.board_stage
+    assert_redirected_to board_projects_path(anchor: 'mx-col-idea')
+  end
+
   def test_projects_list
     login_as :admin_user
     get :index

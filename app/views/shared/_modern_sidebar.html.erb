@@ -11,6 +11,7 @@
 
   <nav class="mx-nav" aria-label="<%= t('modern.views') %>">
     <%= modern_nav_link t('modern.next_actions'), root_path, 'list-check', count: modern_next_actions_count, accesskey: 't', title: t('layouts.navigation.home_title') %>
+    <%= modern_nav_link t('modern.board.nav'), board_projects_path, 'table-columns' %>
     <%= modern_nav_link t('layouts.navigation.starred'), tag_path('starred'), 'star', count: modern_starred_count, title: t('layouts.navigation.starred_title') %>
     <%= modern_nav_link t('layouts.navigation.tickler'), tickler_path, 'clock', count: modern_tickler_count, accesskey: 'k', title: t('layouts.navigation.tickler_title') %>
     <%= modern_nav_link t('layouts.navigation.calendar'), calendar_path, 'calendar', title: t('layouts.navigation.calendar_title') %>

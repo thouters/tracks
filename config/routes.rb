@@ -78,6 +78,9 @@ Rails.application.routes.draw do
       post 'order'
       post 'alphabetize'
       post 'actionize'
+      get 'board'
+      post 'board_move'
+      post 'board_create'
     end
     resources :todos
   end

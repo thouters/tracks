@@ -559,6 +559,39 @@ nl:
   modern:
     add: Toevoegen
     add_action: Actie toevoegen
+    board:
+      add_label: Nieuw project in %{column}
+      add_placeholder: Nieuw project…
+      all_done:
+        one: Het afgewerkte project
+        other: Alle %{count} afgewerkte projecten
+      blocked: Vast
+      drag: Slepen om te verplaatsen of te prioriteren
+      empty: Sleep hier een project naartoe
+      hidden: Verborgen
+      hints:
+        doing: Waar je nu aan werkt; bovenaan gaat voor
+        done: De laatst afgewerkte projecten
+        idea: Verborgen in Tracks, de acties tellen nog niet mee
+        planned: Volgende in de rij
+        waiting: Wacht op iets of iemand
+      intro: Sleep projecten tussen de kolommen; hoe hoger in een kolom, hoe belangrijker.
+      list_view: Lijst
+      move_failed: Het project kon niet verplaatst worden; de pagina wordt opnieuw geladen.
+      move_to: "%{project} verplaatsen naar"
+      nav: Projectbord
+      no_actions: Geen acties
+      open_actions:
+        one: 1 actie
+        other: "%{count} acties"
+      page_title: TRACKS::Projectbord
+      review: Review
+      stages:
+        doing: Bezig
+        done: Klaar
+        idea: Idee
+        planned: Gepland
+        waiting: Wacht
     close_menu: Menu sluiten
     filter_all: Alles
     filter_due: Deadline & te laat

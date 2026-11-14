@@ -1,0 +1,40 @@
+<li class="mx-card<%= ' is-hidden' if project.hidden? && stage != 'idea' %>" data-id="<%= project.id %>">
+  <div class="mx-card-top">
+    <span class="mx-card-rank" aria-hidden="true"></span>
+    <%= link_to project.name, project_path(project), class: 'mx-card-title' %>
+    <span class="mx-card-grip" title="<%= t('modern.board.drag') %>" aria-hidden="true"><%= icon('fas', 'grip-vertical') %></span>
+  </div>
+
+  <% if card[:next_action] && stage != 'done' %>
+    <p class="mx-card-next"><%= icon('fas', 'arrow-right', class: 'mx-card-next-icon') %> <%= card[:next_action].description %></p>
+  <% end %>
+
+  <div class="mx-card-meta">
+    <% if stage == 'done' %>
+      <span class="mx-badge"><%= icon('fas', 'circle-check') %> <%= prefs.format_date(project.completed_at) if project.completed_at %></span>
+    <% else %>
+      <% if card[:open] > 0 %>
+        <span class="mx-badge"><%= t('modern.board.open_actions', count: card[:open]) %></span>
+      <% elsif stage != 'idea' %>
+        <span class="mx-badge mx-badge-warn"><%= t('modern.board.no_actions') %></span>
+      <% end %>
+      <% if card[:due] %><span class="mx-card-due"><%= due_date(card[:due]) %></span><% end %>
+      <% if card[:blocked] %><span class="mx-badge mx-badge-warn"><%= t('modern.board.blocked') %></span><% end %>
+      <% if card[:review] && stage != 'idea' %><span class="mx-badge mx-badge-accent"><%= t('modern.board.review') %></span><% end %>
+      <span class="mx-badge mx-badge-hidden"><%= icon('fas', 'eye-slash') %> <%= t('modern.board.hidden') %></span>
+    <% end %>
+  </div>
+
+  <% if (card[:open] > 0 || card[:percent] > 0) && stage != 'idea' %>
+    <span class="mx-progress" aria-hidden="true"><span style="width: <%= card[:percent] %>%"></span></span>
+  <% end %>
+
+  <label class="mx-card-move">
+    <span class="mx-sr-only"><%= t('modern.board.move_to', project: project.name) %></span>
+    <select class="mx-card-stage">
+      <% Project::STAGES.each do |s| %>
+        <option value="<%= s %>"<%= ' selected' if s == stage %>><%= t("modern.board.stages.#{s}") %></option>
+      <% end %>
+    </select>
+  </label>
+</li>

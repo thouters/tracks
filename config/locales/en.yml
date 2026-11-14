@@ -611,6 +611,39 @@ en:
   modern:
     add: Add
     add_action: Add an action
+    board:
+      add_label: New project in %{column}
+      add_placeholder: New project…
+      all_done:
+        one: The completed project
+        other: All %{count} completed projects
+      blocked: Stuck
+      drag: Drag to move or prioritize
+      empty: Drop a project here
+      hidden: Hidden
+      hints:
+        doing: What you are working on; the top comes first
+        done: The most recently completed projects
+        idea: Hidden in Tracks, its actions do not count yet
+        planned: Next in line
+        waiting: Waiting for something or someone
+      intro: Drag projects between the columns; the higher in a column, the more important.
+      list_view: List
+      move_failed: The project could not be moved; the page will reload.
+      move_to: Move %{project} to
+      nav: Project board
+      no_actions: No actions
+      open_actions:
+        one: 1 action
+        other: "%{count} actions"
+      page_title: TRACKS::Project board
+      review: Review
+      stages:
+        doing: Doing
+        done: Done
+        idea: Idea
+        planned: Planned
+        waiting: Waiting
     close_menu: Close menu
     filter_all: All
     filter_due: Due & overdue

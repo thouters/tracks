@@ -235,6 +235,86 @@ var ModernUI = (function ($) {
     });
   }
 
+  /* --- project board (projects#board) --------------------------------- */
+  function setupBoard() {
+    var $board = $('#mx-board');
+    if (!$board.length) return;
+    var url = $board.data('move-url');
+    var touch = window.matchMedia && window.matchMedia('(hover: none)').matches;
+
+    // the rank numbers (priority) and the column counts
+    function refresh() {
+      $board.find('.mx-cards').each(function () {
+        var $list = $(this);
+        var stage = $list.data('stage');
+        var $cards = $list.children('.mx-card');
+        $cards.each(function (i) {
+          $(this).find('.mx-card-rank').text(stage === 'done' || stage === 'idea' ? '' : i + 1);
+          $(this).find('.mx-card-stage').val(stage);
+        });
+        if (stage !== 'done') $list.closest('.mx-column').find('.mx-column-count').text($cards.length);
+      });
+    }
+
+    function save($card) {
+      var $list = $card.closest('.mx-cards');
+      var order = $list.children('.mx-card').map(function () { return $(this).data('id'); }).get();
+      $card.addClass('is-saving');
+      refresh();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: { id: $card.data('id'), stage: $list.data('stage'), order: order }
+      }).done(function (res) {
+        $card.removeClass('is-saving');
+        $card.toggleClass('is-hidden', res.state === 'hidden' && res.stage !== 'idea');
+      }).fail(function () {
+        window.alert($board.data('error'));
+        window.location.reload();
+      });
+    }
+
+    var startList, startIndex;
+    $board.find('.mx-cards').sortable({
+      connectWith: '#mx-board .mx-cards',
+      items: '> .mx-card',
+      handle: touch ? '.mx-card-grip' : false,
+      cancel: 'select, input, button',
+      placeholder: 'mx-card-placeholder',
+      forcePlaceholderSize: true,
+      tolerance: 'pointer',
+      distance: 4,
+      start: function (ev, ui) {
+        startList = ui.item.parent()[0];
+        startIndex = ui.item.index();
+      },
+      stop: function (ev, ui) {
+        if (ui.item.parent()[0] === startList && ui.item.index() === startIndex) return;
+        save(ui.item);
+      }
+    });
+
+    // the menu on each card: to the bottom of the chosen column
+    $board.on('change', '.mx-card-stage', function () {
+      var $card = $(this).closest('.mx-card');
+      var $target = $board.find('.mx-cards[data-stage="' + $(this).val() + '"]');
+      $card.appendTo($target);
+      save($card);
+      $card.removeClass('is-moved');
+      void $card[0].offsetWidth;
+      $card.addClass('is-moved');
+      if (touch) $target.closest('.mx-column')[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    });
+
+    // after adding a project, scroll to its column
+    if (window.location.hash) {
+      var col = document.getElementById(window.location.hash.slice(1));
+      if (col) col.scrollIntoView({ block: 'nearest', inline: 'start' });
+    }
+    refresh();
+  }
+
   /* "/" focuses search, "n" the quick-add bar, outside text fields */
   function setupShortcuts() {
     $(document).on('keydown', function (ev) {
@@ -257,6 +337,7 @@ var ModernUI = (function ($) {
     setupFilters();
     setupDrawer();
     setupShortcuts();
+    setupBoard();
   }
 
   return { init: init, parse: parse, parseDate: parseDate };

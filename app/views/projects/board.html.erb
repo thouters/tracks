@@ -1,0 +1,42 @@
+<%# The project board: one column per Project::STAGES, cards dragged between
+    them with modern.js (ModernUI's setupBoard) %>
+<div class="mx-board-page">
+  <div class="mx-board-bar">
+    <p class="mx-board-intro"><%= t('modern.board.intro') %></p>
+    <%= link_to projects_path, class: 'mx-button' do %><%= icon('fas', 'list') %> <%= t('modern.board.list_view') %><% end %>
+  </div>
+
+  <div class="mx-board" id="mx-board" data-move-url="<%= board_move_projects_path(format: :json) %>"
+       data-error="<%= t('modern.board.move_failed') %>">
+    <% Project::STAGES.each do |stage| %>
+      <% cards = @board_columns[stage] %>
+      <section class="mx-column mx-column-<%= stage %>" id="mx-col-<%= stage %>" aria-labelledby="mx-col-title-<%= stage %>">
+        <header class="mx-column-head">
+          <span class="mx-column-dot" aria-hidden="true"></span>
+          <h2 class="mx-column-title" id="mx-col-title-<%= stage %>"><%= t("modern.board.stages.#{stage}") %></h2>
+          <span class="mx-column-count"><%= stage == 'done' ? @board_done_count : cards.size %></span>
+        </header>
+        <p class="mx-column-hint"><%= t("modern.board.hints.#{stage}") %></p>
+
+        <ol class="mx-cards" data-stage="<%= stage %>" data-empty="<%= t('modern.board.empty') %>">
+          <% cards.each do |project| %>
+            <%= render partial: 'board_card', locals: { project: project, card: @board_cards[project.id], stage: stage } %>
+          <% end %>
+        </ol>
+
+        <% if stage == 'done' %>
+          <% if @board_done_count > cards.size %>
+            <%= link_to t('modern.board.all_done', count: @board_done_count), done_projects_path, class: 'mx-column-more' %>
+          <% end %>
+        <% else %>
+          <%= form_tag board_create_projects_path, class: 'mx-column-add' do %>
+            <%= hidden_field_tag :stage, stage, id: nil %>
+            <label class="mx-sr-only" for="mx-add-<%= stage %>"><%= t('modern.board.add_label', column: t("modern.board.stages.#{stage}")) %></label>
+            <%= text_field_tag :name, nil, id: "mx-add-#{stage}", placeholder: t('modern.board.add_placeholder'), autocomplete: 'off', required: true %>
+            <button type="submit" class="mx-icon-button" aria-label="<%= t('modern.new_project') %>"><%= icon('fas', 'plus') %></button>
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

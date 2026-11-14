@@ -300,6 +300,60 @@ class ProjectsController < ApplicationController
     init_hidden_todo_counts(['project']) if @state == 'hidden'
   end
 
+  # The project board: the projects as cards in the columns of
+  # Project::STAGES, highest priority on top
+  BOARD_DONE_LIMIT = 10
+
+  def board
+    @page_title = t('modern.board.page_title')
+    @source_view = 'project_board'
+    projects = current_user.projects.to_a
+    done, open = projects.partition(&:completed?)
+    @board_done_count = done.size
+    done = done.sort_by { |p| p.completed_at || p.updated_at }.reverse.first(BOARD_DONE_LIMIT)
+    @board_cards = board_cards(open + done)
+    @board_columns = Project::STAGES.index_with { [] }
+    open.sort_by { |p| [p.board_position || Float::INFINITY, p.position || 0, p.name.downcase] }
+        .each { |p| @board_columns[p.board_stage] << p }
+    @board_columns['done'] = done
+  end
+
+  # A card was dragged (or moved with its menu) to `stage`; `order` is the ids
+  # of that column's cards from top to bottom
+  def board_move
+    project = current_user.projects.find(params[:id])
+    stage = params[:stage].to_s
+    return head :unprocessable_entity unless Project::STAGES.include?(stage)
+
+    Project.transaction do
+      project.move_to_stage!(stage) unless project.board_stage == stage && project.stage == stage
+      if stage != 'done'
+        ids = Array(params[:order]).map(&:to_i)
+        current_user.projects.where(id: ids).each do |p|
+          p.update_column(:board_position, ids.index(p.id))
+        end
+      end
+    end
+    project.reload
+    render json: { id: project.id, stage: project.board_stage, state: project.state }
+  rescue ActiveRecord::RecordInvalid, AASM::InvalidTransition => e
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  # A new project straight into a column, at the bottom
+  def board_create
+    stage = Project::STAGES.include?(params[:stage]) ? params[:stage] : 'idea'
+    project = current_user.projects.build(name: params[:name])
+    last = current_user.projects.where(stage: stage).maximum(:board_position)
+    project.board_position = last.to_i + 1
+    if project.save
+      project.move_to_stage!(stage)
+    else
+      notify :error, project.errors.full_messages.to_sentence
+    end
+    redirect_to board_projects_path(anchor: "mx-col-#{stage}")
+  end
+
   def done_todos
     done_todos_for current_user.projects.find(params[:id])
   end
@@ -309,6 +363,33 @@ class ProjectsController < ApplicationController
   end
 
   protected
+
+  # What a board card shows: open actions, progress, the first next action,
+  # the nearest deadline and whether it is stuck
+  def board_cards(projects)
+    ids = projects.map(&:id)
+    todos = current_user.todos.where(project_id: ids)
+    open = todos.not_completed.group(:project_id).count
+    done = todos.completed.group(:project_id).count
+    waiting = todos.deferred_or_blocked.group(:project_id).count
+    due = todos.not_completed.are_due.group(:project_id).minimum(:due)
+    next_actions = todos.active_or_hidden
+                        .order(Arel.sql("todos.due IS NULL, todos.due ASC, todos.created_at ASC"))
+                        .select(:id, :project_id, :description).to_a.group_by(&:project_id)
+    projects.to_h do |p|
+      o = open[p.id].to_i
+      d = done[p.id].to_i
+      w = waiting[p.id].to_i
+      [p.id, {
+        open: o,
+        percent: (o + d).zero? ? 0 : (100 * d / (o + d)),
+        next_action: next_actions[p.id]&.first,
+        due: due[p.id],
+        blocked: !p.completed? && w > 0 && o == w,
+        review: p.needs_review?(current_user)
+      }]
+    end
+  end
 
   def update_state_counts
     @active_projects_count = current_user.projects.active.count

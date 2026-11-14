@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_20_000743) do
+ActiveRecord::Schema.define(version: 2026_11_14_120000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -106,6 +106,8 @@ ActiveRecord::Schema.define(version: 2020_08_20_000743) do
     t.datetime "completed_at"
     t.string "default_tags"
     t.datetime "last_reviewed"
+    t.string "stage", limit: 20
+    t.integer "board_position"
     t.index ["state"], name: "index_projects_on_state"
     t.index ["user_id", "name"], name: "index_projects_on_user_id_and_name"
     t.index ["user_id", "state"], name: "index_projects_on_user_id_and_state"
