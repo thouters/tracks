@@ -27,6 +27,8 @@
   --tr-shadow: 0 1px 2px rgba(20, 20, 10, .04);
   --tr-shadow-pop: 0 8px 24px rgba(20, 20, 10, .12);
   --tr-icon-filter: none;
+  // grip.png is white dots with a faint shadow: make the dots solid ink
+  --tr-grip-filter: brightness(0);
   --tr-ctx-1: #3651D4;
   --tr-ctx-2: #B4400C;
   --tr-ctx-3: #0F766E;
@@ -61,6 +63,7 @@
     --tr-shadow-pop: 0 8px 24px rgba(0, 0, 0, .5);
     // the icons are dark GIF/PNG sprites: turn them light, keep their hue
     --tr-icon-filter: invert(.88) hue-rotate(180deg);
+    --tr-grip-filter: brightness(0) invert(1);
     --tr-ctx-1: #7D93FF;
     --tr-ctx-2: #F08A4B;
     --tr-ctx-3: #3CC2B0;
@@ -87,7 +90,7 @@ body { background-color: var(--tr-bg); }
     a:hover { color: var(--tr-accent); }
   }
 
-  img.icon, a.icon img, .container_toggle img, img.grip, img.todo-submenu,
+  img.icon, a.icon img, .container_toggle img, img.todo-submenu,
   .show_notes img, .todo_star, img.edit_item {
     filter: var(--tr-icon-filter);
   }
@@ -167,6 +170,20 @@ body { background-color: var(--tr-bg); }
     }
     &::placeholder { color: var(--tr-muted); }
     &[disabled], &[readonly] { background-color: var(--tr-surface-2); }
+  }
+  // the preferences give checkboxes .form-control, which makes them look
+  // like an empty text field: keep them a plain checkbox
+  input[type="checkbox"].form-control {
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin: 4px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+    accent-color: var(--tr-accent);
   }
 
   .input-group-addon {
@@ -333,6 +350,7 @@ body { background-color: var(--tr-bg); }
 
   // grip, checkbox, text, then the tools; edit and the menu show on hover
   .item-show > img.grip { order: 0; opacity: .4; cursor: grab; }
+  img.grip { filter: var(--tr-grip-filter); }
   .item-show > .item-checkbox { order: 1; }
   .item-show > .description { order: 2; }
   .item-show > a.edit_item, .item-show > a.icon.edit_item { order: 3; }
