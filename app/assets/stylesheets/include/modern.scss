@@ -975,6 +975,43 @@ body.modern-ui { margin: 0; }
   pointer-events: none;
 }
 .mx-quickadd:focus-within .mx-quickadd-help { display: block; }
+.mx-quickadd.mx-suggesting .mx-quickadd-help { display: none; }
+
+// completion of @context ~project #tag, under the word being typed
+.mx-suggest {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  min-width: 180px;
+  max-width: 320px;
+  max-height: 264px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--tr-border);
+  border-radius: 10px;
+  background: var(--tr-surface);
+  box-shadow: var(--tr-shadow-pop);
+  &[hidden] { display: none; }
+}
+.mx-suggest-item {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--tr-text);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  &:hover { background: var(--tr-surface-2); }
+  &[aria-selected="true"] { background: var(--tr-accent-soft); color: var(--tr-accent-ink); }
+}
+.mx-suggest-marker { color: var(--tr-muted); font-weight: 600; }
+.mx-suggest-name { overflow: hidden; text-overflow: ellipsis; }
 
 .mx-filters {
   display: flex;

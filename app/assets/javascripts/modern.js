@@ -72,23 +72,23 @@ var ModernUI = (function ($) {
   }
 
   /* Splits "Call plumber @phone ~House #urgent <fri *" into its parts, the
-   * same markers as Tracks' e-mail gateway (RichMessageExtractor). A project
-   * with spaces: ~"Garden shed" or ~Garden_shed. */
+   * same markers as Tracks' e-mail gateway (RichMessageExtractor). A name
+   * with spaces between quotes: ~"Garden shed", @"At home", or ~Garden_shed. */
   function parse(text, contexts, projects) {
     var out = { description: [], tags: [], context: null, project: null, due: null, showFrom: null, starred: false, errors: [] };
-    var re = /(~"[^"]+"|~\S+|@\S+|#\S+|[<>]\S+|(?:due|start):\S+|\*(?=\s|$)|\S+)/g;
+    var re = /([@~#]"[^"]+"|~\S+|@\S+|#\S+|[<>]\S+|(?:due|start):\S+|\*(?=\s|$)|\S+)/g;
     var m;
     while ((m = re.exec(text)) !== null) {
       var tok = m[1];
       var c = tok.charAt(0);
       if (c === '@' && tok.length > 1) {
-        var wantedContext = tok.slice(1);
+        var wantedContext = unquote(tok.slice(1));
         out.context = matchName(wantedContext, contexts) || matchName(tok, contexts) || wantedContext;
       } else if (c === '~' && tok.length > 1) {
-        var wantedProject = tok.slice(1).replace(/^"|"$/g, '').replace(/_/g, ' ');
+        var wantedProject = /^"/.test(tok.slice(1)) ? unquote(tok.slice(1)) : tok.slice(1).replace(/_/g, ' ');
         out.project = matchName(wantedProject, projects) || wantedProject;
       } else if (c === '#' && tok.length > 1) {
-        out.tags.push(tok.slice(1));
+        out.tags.push(unquote(tok.slice(1)));
       } else if ((c === '<' || c === '>' || /^(due|start):/i.test(tok)) && tok.length > 1) {
         var isDue = c === '<' || /^due:/i.test(tok);
         var raw = tok.replace(/^([<>]|due:|start:)/i, '');
@@ -109,6 +109,10 @@ var ModernUI = (function ($) {
     return out;
   }
 
+  function unquote(s) {
+    return s.replace(/^"|"$/g, '');
+  }
+
   function formatDate(d) {
     var format = (typeof dateFormat !== 'undefined' && dateFormat) ? dateFormat : 'dd/mm/yy';
     return $.datepicker.formatDate(format, d);
@@ -125,10 +129,13 @@ var ModernUI = (function ($) {
 
     var contexts = $quick.data('contexts') || [];
     var projects = $quick.data('projects') || [];
+    var tags = $quick.data('tags') || [];
     var $input = $('#mx-quickadd-input');
+    var suggest = setupSuggestions($quick, $input, { '@': contexts, '~': projects, '#': tags });
 
     $quick.on('submit', function (ev) {
       ev.preventDefault();
+      if (suggest.isOpen()) return;
       var text = $.trim($input.val());
       if (!text) return;
       var p = parse(text, contexts, projects);
@@ -169,6 +176,145 @@ var ModernUI = (function ($) {
       $quick[0].scrollIntoView({ block: 'center' });
       $input.trigger('focus');
     });
+  }
+
+  /* --- completion of @context ~project #tag in the quick-add bar ------ */
+
+  /* The marker and word being typed at the caret: "@ph" in "Call @ph|" */
+  function tokenAtCaret(value, caret) {
+    var before = value.slice(0, caret);
+    var m = before.match(/(^|\s)([@~#])("[^"]*|[^\s"]*)$/);
+    if (!m) return null;
+    var quoted = m[3].charAt(0) === '"';
+    var rest = value.slice(caret).match(quoted ? /^[^"\s]*"?/ : /^\S*/)[0];
+    return {
+      marker: m[2],
+      query: quoted ? m[3].slice(1) : m[3],
+      start: caret - m[2].length - m[3].length,
+      end: caret + rest.length
+    };
+  }
+
+  /* Names for the query: those starting with it, then those with a word
+   * starting with it, then those containing it */
+  function suggestionsFor(query, names, limit) {
+    var q = query.toLowerCase().replace(/_/g, ' ');
+    var ranked = [[], [], []];
+    names.forEach(function (name) {
+      var n = name.toLowerCase().replace(/^@/, '');
+      if (n.indexOf(q) === 0) ranked[0].push(name);
+      else if ((' ' + n).indexOf(' ' + q) !== -1) ranked[1].push(name);
+      else if (n.indexOf(q) !== -1) ranked[2].push(name);
+    });
+    return ranked[0].concat(ranked[1], ranked[2]).slice(0, limit);
+  }
+
+  /* How a name goes into the bar, so that parse() reads it back */
+  function insertText(marker, name) {
+    if (marker === '@') name = name.replace(/^@/, '');
+    return marker + (/[\s"]/.test(name) ? '"' + name.replace(/"/g, '') + '"' : name);
+  }
+
+  var measureCanvas;
+  function textWidth(text, el) {
+    measureCanvas = measureCanvas || document.createElement('canvas');
+    var ctx = measureCanvas.getContext('2d');
+    var cs = window.getComputedStyle(el);
+    ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    return ctx.measureText(text).width;
+  }
+
+  function setupSuggestions($quick, $input, namesByMarker) {
+    var input = $input[0];
+    var $list = $('<ul class="mx-suggest" id="mx-suggest" role="listbox" hidden></ul>').appendTo($quick);
+    var token = null;
+    var items = [];
+    var active = 0;
+
+    $input.attr({ role: 'combobox', 'aria-autocomplete': 'list', 'aria-controls': 'mx-suggest', 'aria-expanded': 'false' });
+
+    function isOpen() { return !$list.prop('hidden'); }
+
+    function close() {
+      token = null;
+      items = [];
+      $list.prop('hidden', true).empty();
+      $quick.removeClass('mx-suggesting');
+      $input.attr('aria-expanded', 'false').removeAttr('aria-activedescendant');
+    }
+
+    function highlight(i) {
+      active = (i + items.length) % items.length;
+      var $opts = $list.children();
+      $opts.attr('aria-selected', 'false');
+      var $a = $opts.eq(active).attr('aria-selected', 'true');
+      $input.attr('aria-activedescendant', $a.attr('id'));
+      if ($a[0] && $a[0].scrollIntoView) $a[0].scrollIntoView({ block: 'nearest' });
+    }
+
+    function position() {
+      var x = input.offsetLeft + textWidth(input.value.slice(0, token.start), input) - input.scrollLeft;
+      var max = $quick.innerWidth() - $list.outerWidth() - 8;
+      $list.css('left', Math.max(8, Math.min(x, max)) + 'px');
+    }
+
+    function update() {
+      var t = input.selectionStart === input.selectionEnd ? tokenAtCaret(input.value, input.selectionStart) : null;
+      var names = t ? (namesByMarker[t.marker] || []) : [];
+      var found = t ? suggestionsFor(t.query, names, 8) : [];
+      // nothing more to complete when the only match is what is typed
+      if (found.length === 1 && insertText(t.marker, found[0]).toLowerCase() === input.value.slice(t.start, t.end).toLowerCase()) found = [];
+      if (!found.length) { close(); return; }
+      token = t;
+      items = found;
+      $list.empty();
+      found.forEach(function (name, i) {
+        $('<li role="option" class="mx-suggest-item"></li>')
+          .attr('id', 'mx-suggest-' + i)
+          .append($('<span class="mx-suggest-marker" aria-hidden="true"></span>').text(t.marker))
+          .append($('<span class="mx-suggest-name"></span>').text(t.marker === '@' ? name.replace(/^@/, '') : name))
+          .appendTo($list);
+      });
+      $list.prop('hidden', false);
+      $quick.addClass('mx-suggesting');
+      $input.attr('aria-expanded', 'true');
+      position();
+      highlight(0);
+    }
+
+    function accept(i) {
+      var value = input.value;
+      var text = insertText(token.marker, items[i]);
+      var after = value.slice(token.end);
+      if (!/^\s/.test(after)) after = ' ' + after;
+      input.value = value.slice(0, token.start) + text + after;
+      var caret = token.start + text.length + 1;
+      input.setSelectionRange(caret, caret);
+      close();
+    }
+
+    $input.on('input click', update);
+    $input.on('keyup', function (ev) {
+      if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight' || ev.key === 'Home' || ev.key === 'End') update();
+    });
+    $input.on('keydown', function (ev) {
+      if (!isOpen()) return;
+      switch (ev.key) {
+        case 'ArrowDown': ev.preventDefault(); highlight(active + 1); break;
+        case 'ArrowUp': ev.preventDefault(); highlight(active - 1); break;
+        case 'Enter':
+        case 'Tab': ev.preventDefault(); accept(active); break;
+        case 'Escape': ev.preventDefault(); ev.stopPropagation(); close(); break;
+      }
+    });
+    $input.on('blur', close);
+    // mousedown, so the field keeps focus
+    $list.on('mousedown', '.mx-suggest-item', function (ev) {
+      ev.preventDefault();
+      accept($(this).index());
+    });
+
+    return { isOpen: isOpen, close: close };
   }
 
   function showFullForm(show) {
@@ -340,7 +486,7 @@ var ModernUI = (function ($) {
     setupBoard();
   }
 
-  return { init: init, parse: parse, parseDate: parseDate };
+  return { init: init, parse: parse, parseDate: parseDate, tokenAtCaret: tokenAtCaret, suggestionsFor: suggestionsFor, insertText: insertText };
 })(jQuery);
 
 jQuery(function () { ModernUI.init(); });

@@ -605,7 +605,7 @@ nl:
     next_actions: Volgende acties
     no_projects: Geen actieve projecten
     open_menu: Menu openen
-    quickadd_help: "@context ~project #tag, deadline <vr of <261120, tonen vanaf >ma, * voor een ster"
+    quickadd_help: "@context ~project #tag (met spaties: ~\"Mijn project\"), deadline <vr of <261120, tonen vanaf >ma, * voor een ster"
     quickadd_placeholder: "Actie toevoegen… bv. Loodgieter bellen @telefoon ~Huis <vr"
     search: Zoeken
     search_placeholder: Acties zoeken

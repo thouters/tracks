@@ -17,7 +17,8 @@
 <%# Shown by modern.js on pages that have the new-action form %>
 <form class="mx-quickadd" id="mx-quickadd" hidden
       data-contexts="<%= current_user.contexts.pluck(:name).to_json %>"
-      data-projects="<%= current_user.projects.uncompleted.pluck(:name).to_json %>">
+      data-projects="<%= current_user.projects.uncompleted.pluck(:name).to_json %>"
+      data-tags="<%= current_user.tags.where.not(name: 'starred').order(:name).distinct.pluck(:name).to_json %>">
   <%= icon('fas', 'plus', class: 'mx-quickadd-icon') %>
   <label for="mx-quickadd-input" class="mx-sr-only"><%= t('modern.add_action') %></label>
   <input type="text" id="mx-quickadd-input" autocomplete="off" placeholder="<%= t('modern.quickadd_placeholder') %>" aria-describedby="mx-quickadd-help">
