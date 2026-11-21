@@ -1,0 +1,23 @@
+# database.yml of the Nix package: everything comes from the environment,
+# which the NixOS module (nix/module.nix) sets. Unlike database.docker.yml,
+# host, port, password and socket may be unset (empty becomes null), so a
+# local database can be reached over its Unix socket without a password.
+# Rails 6.1 reads this file with the ERB tags blanked out while loading its
+# rake tasks, so the ERB stays in the values.
+default: &default
+  adapter: <%= ENV.fetch('DATABASE_TYPE', 'mysql2') %>
+  encoding: <%= ENV.fetch('DATABASE_ENCODING', 'utf8') %>
+  database: <%= ENV.fetch('DATABASE_NAME', 'tracks') %>
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS', '5') %>
+  host: <%= ENV['DATABASE_HOST'] %>
+  port: <%= ENV['DATABASE_PORT'] %>
+  socket: <%= ENV['DATABASE_SOCKET'] %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+
+production:
+  <<: *default
+development:
+  <<: *default
+test:
+  <<: *default
